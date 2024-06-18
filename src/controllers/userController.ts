@@ -7,8 +7,14 @@ import { validatePassword } from '../utils/validatePassword';
 export const registerUser = async (req: Request, res: Response) => {
   const { username, email, password, role } = req.body;
 
+  let blogImage = null
   if(!username || !email || !password || !role){
       return res.status(403).json('Enter all Fields')
+  }
+
+  if(req.file) {
+    const uploadedImage = req.file
+    blogImage = uploadedImage.filename
   }
 
   try {
@@ -24,6 +30,7 @@ export const registerUser = async (req: Request, res: Response) => {
       username,
       email,
       password: hashedPassword,
+      image: blogImage,
       role: role,
     });
 

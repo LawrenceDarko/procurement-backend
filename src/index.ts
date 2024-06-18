@@ -7,6 +7,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import protect from './middleware/authMiddleware';
 import dotenv from 'dotenv';
+import path from 'path';
 
 dotenv.config();
 
@@ -15,14 +16,16 @@ const server = http.createServer(app);
 
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://e-procurement.surge.sh'],
     credentials: true,
 }));
 
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
 
-
+app.use("/images",
+    express.static(path.join(process.cwd(), 'uploads'))
+)
 
 app.use('/api/user', userRoutes);
 // app.use('/api/workspace', protect, workspaceRoutes);
