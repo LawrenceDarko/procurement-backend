@@ -5,9 +5,10 @@ const mongoose = require('mongoose');
 import userRoutes from './routes/userRoutes';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import protect from './middleware/authMiddleware';
 import dotenv from 'dotenv';
 import path from 'path';
+import roleRoutes from './routes/roleRoutes';
+import { protect } from './middleware/authMiddleware';
 
 dotenv.config();
 
@@ -23,11 +24,10 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
 
-app.use("/images",
-    express.static(path.join(process.cwd(), 'uploads'))
-)
+app.use("/images", express.static(path.join(process.cwd(), 'uploads')))
 
-app.use('/api/user', userRoutes);
+app.use('/api/user', protect, userRoutes);
+app.use('/api/roles', roleRoutes);
 // app.use('/api/workspace', protect, workspaceRoutes);
 // app.use('/api/channels', protect, channelRoutes);
 // app.use('/api/direct-chat', protect, directChatRoutes);
