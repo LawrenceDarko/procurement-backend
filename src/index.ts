@@ -26,7 +26,7 @@ app.use(cookieParser(process.env.JWT_SECRET));
 
 app.use("/images", express.static(path.join(process.cwd(), 'uploads')))
 
-app.use('/api/user', protect, userRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/roles', roleRoutes);
 // app.use('/api/workspace', protect, workspaceRoutes);
 // app.use('/api/channels', protect, channelRoutes);
