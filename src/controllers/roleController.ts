@@ -1,18 +1,18 @@
 import { Request, Response } from 'express';
 import Role from '../models/Role';
-import User from '../models/User';
 
 export const createRole = async (req: Request, res: Response) => {
-    const { name, permissions } = req.body;
+    const { name, description } = req.body;
 
     try {
-        // Ensure AdministratorAccess includes 'all'
-        if (permissions.AdministratorAccess && !permissions.AdministratorAccess.includes('all')) {
-            permissions.AdministratorAccess.push('all');
+        const existingRole = await Role.findOne({ name });
+
+        if (existingRole) {
+        return res.status(400).json({ message: 'Role already exists' });
         }
 
-        const role = new Role({ name, permissions });
-        await role.save();
+        const role = await Role.create({ name, description });
+
         res.status(201).json(role);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -28,18 +28,34 @@ export const getRoles = async (req: Request, res: Response) => {
     }
 };
 
-export const assignRole = async (req: Request, res: Response) => {
-    const { userId, roleId } = req.body;
+export const updateRole = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { name, description } = req.body;
 
     try {
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        const role = await Role.findByIdAndUpdate(id, { name, description }, { new: true });
+
+        if (!role) {
+        return res.status(404).json({ message: 'Role not found' });
         }
 
-        user.role = roleId;
-        await user.save();
-        res.status(200).json(user);
+        res.status(200).json(role);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const deleteRole = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    try {
+        const role = await Role.findByIdAndDelete(id);
+
+        if (!role) {
+        return res.status(404).json({ message: 'Role not found' });
+        }
+
+        res.status(200).json({ message: 'Role deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

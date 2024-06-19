@@ -1,7 +1,6 @@
+const mongoose = require('mongoose');
 import express from 'express';
 import http from 'http';
-const mongoose = require('mongoose');
-
 import userRoutes from './routes/userRoutes';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
