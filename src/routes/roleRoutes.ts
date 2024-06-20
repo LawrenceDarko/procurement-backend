@@ -4,9 +4,9 @@ import { protect } from '../middleware/authMiddleware';
 
 const router = Router();
 
-router.post('/', protect(['admin']), createRole); // Only admins can create roles
-router.get('/', protect(['admin']), getRoles); // Only admins can view all roles
-router.put('/:id', protect(['admin']), updateRole); // Only admins can update roles
-router.delete('/:id', protect(['admin']), deleteRole); // Only admins can delete roles
+router.post('/', protect(['superadmin']), createRole); // Only superadmins can create roles
+router.get('/', protect(['superadmin']), getRoles); // Only superadmins can view all roles
+router.put('/:id', protect(['superadmin']), updateRole); // Only superadmins can update roles
+router.delete('/:id', protect(['superadmin']), deleteRole); // Only superadmins can delete roles
 
 export default router;

@@ -32,7 +32,7 @@ export const protect = (roles: string[] = []) => {
             }
             }
     
-            req.user = await User.findById(decoded.userId).select('-password');;
+            req.user = await User.findById(decoded.userId).select('-password');
             next();
         } catch (error) {
             return res.status(401).json({ message: 'Not authorized, token failed' });

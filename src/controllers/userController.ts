@@ -32,7 +32,7 @@ export const register = async (req: Request, res: Response) => {
 
     const token = generateToken(user._id, role.name);
 
-    res.status(201).json({ token });
+    res.status(201).json({success: true, token, message: 'User created successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -56,8 +56,16 @@ export const login = async (req: Request, res: Response) => {
 
     const token = generateToken(user._id, (user.role as any).name);
 
-    res.status(200).json({ token });
+    const data = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    }
+
+    res.status(200).json({success: true, data, token, message: 'Login successful' });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Server error' });
   }
 };
