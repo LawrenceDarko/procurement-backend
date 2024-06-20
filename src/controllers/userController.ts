@@ -8,6 +8,14 @@ import { validatePassword } from '../utils/validatePassword';
 
 export const register = async (req: Request, res: Response) => {
   const { username, email, password, roleName } = req.body;
+  
+  // console.log("Check", username, email, password, roleName)
+
+  let userProfile = null
+  if(req.file) {
+    const uploadedImage = req.file
+    userProfile = uploadedImage.filename
+  }
 
   try {
     const existingUser = await User.findOne({ email });
@@ -27,6 +35,7 @@ export const register = async (req: Request, res: Response) => {
       username,
       email,
       password: hashedPassword,
+      image: userProfile,
       role: role._id,
     });
 
@@ -60,6 +69,7 @@ export const login = async (req: Request, res: Response) => {
       _id: user._id,
       username: user.username,
       email: user.email,
+      profileImage: user.image,
       role: user.role,
     }
 

@@ -9,6 +9,7 @@ import path from 'path';
 import roleRoutes from './routes/roleRoutes';
 import { protect } from './middleware/authMiddleware';
 import authRoutes from './routes/authRoutes';
+import bodyParser from 'body-parser';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(bodyParser.json());
 app.use(cookieParser(process.env.JWT_SECRET));
 
 app.use("/images", express.static(path.join(process.cwd(), 'uploads')))

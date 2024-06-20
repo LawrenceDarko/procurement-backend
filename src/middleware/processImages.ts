@@ -2,7 +2,7 @@ import path from "path";
 import multer from "multer";
 
 const limits = {
-  fileSize: 4 * 1024 * 1024, // Limit file size to 4MB
+  fileSize: 10 * 1024 * 1024, // Limit file size to 4MB
 };
 const fileFilter = (req: any, file: any, cb: any) => {
     // Check if the uploaded file is an image
