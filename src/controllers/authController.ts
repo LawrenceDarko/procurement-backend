@@ -12,6 +12,12 @@ import Department from '../models/Department';
 export const registerOrganization = async (req: Request, res: Response) => {
     const { name, adminUsername, adminEmail, adminPassword } = req.body;
 
+    let userImage = null
+    if(req.file) {
+        const uploadedImage = req.file
+        userImage = uploadedImage.filename
+    }
+
     try {
         const organization = await Organization.create({ name });
 
@@ -28,6 +34,7 @@ export const registerOrganization = async (req: Request, res: Response) => {
             username: adminUsername,
             email: adminEmail,
             password: hashedPassword,
+            image: userImage,
             role: superadminRole!._id,
             organization: organization._id,
         });
@@ -39,6 +46,7 @@ export const registerOrganization = async (req: Request, res: Response) => {
             username: adminUser.username,
             email: adminUser.email,
             role: adminUser.role,
+            image: userImage,
             organization: adminUser.organization,
         };
         
@@ -54,6 +62,12 @@ export const register = async (req: Request, res: Response) => {
 
     if( !username || !email || !password || !organizationId || !roleName ){
         return res.status(400).json({ message: 'All fields are required'})
+    }
+
+    let userImage = null
+    if(req.file) {
+        const uploadedImage = req.file
+        userImage = uploadedImage.filename
     }
 
     try {
@@ -84,6 +98,7 @@ export const register = async (req: Request, res: Response) => {
             email,
             password: hashedPassword,
             role: role._id,
+            image: userImage,
             organization: organization!._id,
             department: department!._id
         });
@@ -97,6 +112,7 @@ export const register = async (req: Request, res: Response) => {
             role: user.role,
             roleName: role.name,
             organization: user.organization,
+            image: user.image,
             department: user.department
         };
 

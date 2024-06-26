@@ -20,7 +20,7 @@ const userSchema = new Schema<IUser>({
     role: { type: Schema.Types.ObjectId, ref: 'Role', required: true },
     image: { type: String},
     organization: { type: Schema.Types.ObjectId, ref: 'Organization', required: true },
-    department: { type: Schema.Types.ObjectId, ref: 'Department', required: true }
+    department: { type: Schema.Types.ObjectId, ref: 'Department' }
 }, { timestamps: true });
 
 const User = model<IUser>('User', userSchema);
