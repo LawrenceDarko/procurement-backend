@@ -13,6 +13,7 @@ interface AuthenticatedRequest extends Request {
     user?: IUser | any; // Use the IUser interface here
 }
 
+
 export const protect = (roles: string[] = []) => {
     return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -25,11 +26,11 @@ export const protect = (roles: string[] = []) => {
             const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
     
             if (roles.length > 0) {
-            const userRole = await Role.findOne({ name: decoded.role });
-    
-            if (!userRole || !roles.includes(userRole.name)) {
-                return res.status(403).json({ message: 'Forbidden' });
-            }
+                const userRole = await Role.findOne({ name: decoded.role });
+        
+                if (!userRole || !roles.includes(userRole.name)) {
+                    return res.status(403).json({ message: 'Forbidden' });
+                }
             }
     
             req.user = await User.findById(decoded.userId).select('-password');

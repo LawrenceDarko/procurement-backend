@@ -1,19 +1,17 @@
 import { Schema, model, Document } from 'mongoose';
 import { IOrganization } from './Organization';
 
-interface IRole extends Document {
+interface IDepartment extends Document {
     name: string;
-    description: string;
     organization: IOrganization['_id'];
 }
 
-const roleSchema = new Schema<IRole>({
+const departmentSchema = new Schema<IDepartment>({
     name: { type: String, required: true },
-    description: { type: String, required: true },
     organization: { type: Schema.Types.ObjectId, ref: 'Organization', required: true },
 }, { timestamps: true });
 
-const Role = model<IRole>('Role', roleSchema);
+const Department = model<IDepartment>('Department', departmentSchema);
 
-export default Role;
-export { IRole };
+export default Department;
+export { IDepartment };
