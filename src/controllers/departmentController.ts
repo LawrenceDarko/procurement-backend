@@ -26,6 +26,17 @@ export const getDepartments = async (req: Request, res: Response) => {
     }
 };
 
+export const getAllDepartmentsBelongingToAnOrganization = async (req: Request, res: Response) => {
+    const { organizationId } = req.params;
+
+    try {
+        const departments = await Department.find({ organization: organizationId }).populate('organization')
+        res.status(200).json({ success: true, data: departments});
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+
 export const updateDepartment = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { name } = req.body;
@@ -82,6 +93,18 @@ export const getSubDepartments = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+export const getAllSubDepartmentsBelongingToADepartment = async (req: Request, res: Response) => {
+    const { departmentId } = req.params;
+
+    try {
+        const subDepartments = await SubDepartment.find({ department: departmentId }).populate('department')
+        res.status(200).json({ success: true, data: subDepartments});
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+
 
 export const updateSubDepartment = async (req: Request, res: Response) => {
     const { id } = req.params;
