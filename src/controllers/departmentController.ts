@@ -33,6 +33,7 @@ export const getAllDepartmentsBelongingToAnOrganization = async (req: Request, r
         const departments = await Department.find({ organization: organizationId }).populate('organization')
         res.status(200).json({ success: true, data: departments});
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: 'Server error' });
     }
 }
@@ -86,10 +87,12 @@ export const createSubDepartment = async (req: Request, res: Response) => {
 };
 
 export const getSubDepartments = async (req: Request, res: Response) => {
+    console.log("Hello world")
     try {
         const subDepartments = await SubDepartment.find().populate('department');
         res.status(200).json(subDepartments);
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: 'Server error' });
     }
 };

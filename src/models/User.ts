@@ -1,6 +1,7 @@
 import { Schema, model, Document } from 'mongoose';
 import { IRole } from './Role';
 import { IOrganization } from './Organization';
+import { IDepartment } from './Department';
 
 interface IUser extends Document {
     username: string;
@@ -8,6 +9,7 @@ interface IUser extends Document {
     password: string;
     role: IRole['_id'];
     image: string;
+    department: IDepartment['_id'];
     organization: IOrganization['_id'];
 }
 
@@ -17,7 +19,8 @@ const userSchema = new Schema<IUser>({
     password: { type: String, required: true },
     role: { type: Schema.Types.ObjectId, ref: 'Role', required: true },
     image: { type: String},
-    organization: { type: Schema.Types.ObjectId, ref: 'Organization', required: true }
+    organization: { type: Schema.Types.ObjectId, ref: 'Organization', required: true },
+    department: { type: Schema.Types.ObjectId, ref: 'Department', required: true }
 }, { timestamps: true });
 
 const User = model<IUser>('User', userSchema);

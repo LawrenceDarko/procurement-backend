@@ -5,6 +5,8 @@ import Organization from '../models/Organization';
 import { generateToken } from '../utils/generateToken';
 import { hashPassword } from '../utils/hashPassword';
 import validatePassword from '../utils/validatePassword';
+import SubDepartment from '../models/SubDepartment';
+import Department from '../models/Department';
 // import { validatePassword } from '../utils/validatePassword';
 
 export const registerOrganization = async (req: Request, res: Response) => {
@@ -48,7 +50,7 @@ export const registerOrganization = async (req: Request, res: Response) => {
     };
 
 export const register = async (req: Request, res: Response) => {
-    const { username, email, password, organizationId, roleName } = req.body;
+    const { username, email, password, organizationId, departmentId, roleName } = req.body;
 
     if( !username || !email || !password || !organizationId || !roleName ){
         return res.status(400).json({ message: 'All fields are required'})
@@ -58,6 +60,11 @@ export const register = async (req: Request, res: Response) => {
         const organization = await Organization.findById(organizationId);
         if (!organization) {
             return res.status(400).json({ message: 'Organization does not exist' });
+        }
+
+        const department = await Department.findById(departmentId);
+        if (!department) {
+            return res.status(400).json({ message: 'Department does not exist' });
         }
 
         const role = await Role.findOne({ name: roleName, organization: organization._id });
@@ -77,7 +84,8 @@ export const register = async (req: Request, res: Response) => {
             email,
             password: hashedPassword,
             role: role._id,
-            organization: organization._id,
+            organization: organization!._id,
+            department: department!._id
         });
 
         const token = generateToken(user._id, role.name);
@@ -89,6 +97,7 @@ export const register = async (req: Request, res: Response) => {
             role: user.role,
             roleName: role.name,
             organization: user.organization,
+            department: user.department
         };
 
         res.status(201).json({ success: true, data: sanitizedUser, token, message: 'User created Successfully' });

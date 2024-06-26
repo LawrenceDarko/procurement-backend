@@ -9,6 +9,7 @@ import { protect } from './middleware/authMiddleware';
 import authRoutes from './routes/authRoutes';
 import bodyParser from 'body-parser';
 import departmentRoutes from './routes/departmentRoutes';
+import { getOrganizationRoles } from './controllers/rolesController';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use("/images", express.static(path.join(process.cwd(), 'uploads')))
 
 app.use('/api/auth', authRoutes);
 app.use('/api/departments', departmentRoutes);
+app.get('/api/roles/:organizationId', protect(['superadmin', 'admin']), getOrganizationRoles);
 
 
 mongoose.connect(process.env.MONGO_URI).then(() => {
