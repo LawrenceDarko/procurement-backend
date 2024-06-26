@@ -93,6 +93,9 @@ export const register = async (req: Request, res: Response) => {
 
         const hashedPassword = await hashPassword(password);
 
+        
+
+
         const user = await User.create({
             username,
             email,
@@ -100,10 +103,12 @@ export const register = async (req: Request, res: Response) => {
             role: role._id,
             image: userImage,
             organization: organization!._id,
-            department: department
+            department: department!._id
         });
 
         const token = generateToken(user._id, role.name);
+
+        const populatedDepartment = await Department.findById(user.department);
 
         const sanitizedUser = {
             _id: user._id,
@@ -113,7 +118,7 @@ export const register = async (req: Request, res: Response) => {
             roleName: role.name,
             organization: user.organization,
             image: user.image,
-            department: user.department
+            department: populatedDepartment 
         };
 
         res.status(201).json({ success: true, data: sanitizedUser, token, message: 'User created Successfully' });
