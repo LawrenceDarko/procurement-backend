@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import ItemSubCategory from '../models/ItemSubCategory';
+import { AuthenticatedRequest } from '../middleware/authMiddleware';
 
 export const createItemSubCategory = async (req: Request, res: Response) => {
     const { name, description, categoryId } = req.body;
@@ -23,6 +24,16 @@ export const getItemSubCategories = async (req: Request, res: Response) => {
         const itemSubCategories = await ItemSubCategory.find({ category: categoryId }).populate('category');
         res.status(200).json(itemSubCategories);
     } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const getItemSubCategoriesBelongingToAnOrganization = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const itemSubCategories = await ItemSubCategory.find({ organization: req.user!.organization }).populate('category');
+        res.status(200).json({success: true, data: itemSubCategories});
+    } catch (error) {
+        console.log("ERROR FETCHING ORGANIZATION SUB-CATEGORIES", error)
         res.status(500).json({ message: 'Server error' });
     }
 };

@@ -31,8 +31,24 @@ export const createBudget = async (req: Request, res: Response) => {
             totalEstimatedAmount,
         });
 
-        res.status(201).json(budget);
+        res.status(201).json({success: true, data: budget, message: 'Budget Created Successfully'});
     } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const createBudgetsInBulk = async (req: Request, res: Response) => {
+    const budgets = req.body.budgets;
+
+    if (!Array.isArray(budgets)) {
+        return res.status(400).json({ message: 'Invalid data format. "budgets" should be an array.' });
+    }
+
+    try {
+        const createdBudgets = await Budget.insertMany(budgets);
+        res.status(201).json({success: true, data: createdBudgets, message: 'Budget Created Successfully'});
+    } catch (error) {
+        console.log("ERROR CREATING BUDGET IN BULK", error)
         res.status(500).json({ message: 'Server error' });
     }
 };

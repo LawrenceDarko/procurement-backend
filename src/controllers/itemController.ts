@@ -29,8 +29,9 @@ export const createItemsInBulk = async (req: Request, res: Response) => {
 
     try {
         const createdItems = await Item.insertMany(items);
-        res.status(201).json(createdItems);
+        res.status(201).json({success: true, data: createdItems, message: 'Item(s) Created Successfully'});
     } catch (error) {
+        console.log("ERROR ADDING ITEM", error)
         res.status(500).json({ message: 'Server error' });
     }
 };
