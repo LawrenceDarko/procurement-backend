@@ -22,7 +22,7 @@ const server = http.createServer(app);
 
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'https://e-procurement.surge.sh'],
+    origin: ['http://localhost:3000', 'http://e-procurement.surge.sh'],
     credentials: true,
 }));
 
