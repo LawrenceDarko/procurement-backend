@@ -38,7 +38,7 @@ export const createBudget = async (req: Request, res: Response) => {
 };
 
 export const createBudgetsInBulk = async (req: Request, res: Response) => {
-    const budgets = req.body.budgets;
+    const budgets = req.body;
 
     if (!Array.isArray(budgets)) {
         return res.status(400).json({ message: 'Invalid data format. "budgets" should be an array.' });

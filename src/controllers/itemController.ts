@@ -21,7 +21,7 @@ export const createItem = async (req: Request, res: Response) => {
 };
 
 export const createItemsInBulk = async (req: Request, res: Response) => {
-    const items = req.body.items;
+    const items = req.body;
 
     if (!Array.isArray(items)) {
         return res.status(400).json({ message: 'Invalid data format. "items" should be an array.' });
@@ -35,6 +35,8 @@ export const createItemsInBulk = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+
 
 export const getItems = async (req: AuthenticatedRequest, res: Response) => {
     try {
