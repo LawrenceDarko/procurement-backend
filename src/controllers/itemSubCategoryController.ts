@@ -1,15 +1,17 @@
 import { Request, Response } from 'express';
 import ItemSubCategory from '../models/ItemSubCategory';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
+import Organization from '../models/Organization';
 
 export const createItemSubCategory = async (req: Request, res: Response) => {
-    const { name, description, categoryId } = req.body;
+    const { name, description, categoryId, OrganizationId } = req.body;
 
     try {
         const itemSubCategory = await ItemSubCategory.create({
-        name,
-        description,
-        category: categoryId
+            name,
+            description,
+            category: categoryId,
+            organization: OrganizationId
         });
 
         res.status(201).json(itemSubCategory);
