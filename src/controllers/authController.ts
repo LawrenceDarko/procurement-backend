@@ -39,7 +39,7 @@ export const registerOrganization = async (req: Request, res: Response) => {
             organization: organization._id,
         });
 
-        const token = generateToken(adminUser?._id, superadminRole!.name);
+        const token = generateToken(adminUser?._id, superadminRole!.name, adminUser.organization);
 
         const sanitizedAdminUser = {
             _id: adminUser._id,
@@ -52,10 +52,10 @@ export const registerOrganization = async (req: Request, res: Response) => {
         
 
         res.status(201).json({ success: true, data: sanitizedAdminUser, token, message: 'Organization Created Successfully' });
-        } catch (error) {
-            res.status(500).json({ message: 'Server error' });
-        }
-    };
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
 
 export const register = async (req: Request, res: Response) => {
     const { username, email, password, organizationId, departmentId, roleName } = req.body;
@@ -106,7 +106,7 @@ export const register = async (req: Request, res: Response) => {
             department: department!._id
         });
 
-        const token = generateToken(user._id, role.name);
+        const token = generateToken(user._id, role.name, user.organization);
 
         const populatedDepartment = await Department.findById(user.department);
 
@@ -145,8 +145,6 @@ export const login = async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        const token = generateToken(user._id, (user.role as any).name);
-
         const newUser = {
             _id: user._id,
             username: user.username,
@@ -154,6 +152,9 @@ export const login = async (req: Request, res: Response) => {
             role: user.role,
             organization: user.organization
         }
+
+        // const token = generateToken(newUser);
+        const token = generateToken(user._id, (user.role as any).name, user.organization);
 
         res.status(200).json({ success: true, data: newUser, token, message: "User Login Successfully" });
     } catch (error) {

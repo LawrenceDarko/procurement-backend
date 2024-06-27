@@ -6,10 +6,11 @@ import Role from '../models/Role';
 interface JwtPayload {
     userId: string;
     role: any,
+    organization: any
     exp: any
 }
 
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends Request {
     user?: IUser | any; // Use the IUser interface here
 }
 

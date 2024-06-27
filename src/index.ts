@@ -1,15 +1,19 @@
 const mongoose = require('mongoose');
-import express from 'express';
-import http from 'http';
 import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
+import http from 'http';
 import path from 'path';
-import { protect } from './middleware/authMiddleware';
-import authRoutes from './routes/authRoutes';
+import dotenv from 'dotenv';
+import express from 'express';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import authRoutes from './routes/authRoutes';
+import itemRoutes from './routes/itemRoutes';
+import { protect } from './middleware/authMiddleware';
 import departmentRoutes from './routes/departmentRoutes';
+import itemCategoryRoutes from './routes/itemCategoryRoutes';
+import itemSubCategoryRoutes from './routes/itemSubCategoryRoutes';
 import { getOrganizationRoles } from './controllers/rolesController';
+import budgetRoutes from './routes/budgetRoutes';
 
 dotenv.config();
 
@@ -30,6 +34,10 @@ app.use("/images", express.static(path.join(process.cwd(), 'uploads')))
 
 app.use('/api/auth', authRoutes);
 app.use('/api/departments', departmentRoutes);
+app.use('/api/item-categories', itemCategoryRoutes);
+app.use('/api/item-subcategories', itemSubCategoryRoutes);
+app.use('/api/items', itemRoutes);
+app.use('/api/budgets', budgetRoutes);
 app.get('/api/roles/:organizationId', protect(['superadmin', 'admin']), getOrganizationRoles);
 
 
