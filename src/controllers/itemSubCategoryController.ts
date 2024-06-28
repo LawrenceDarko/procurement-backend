@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import ItemSubCategory from '../models/ItemSubCategory';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import Organization from '../models/Organization';
+import Item from '../models/Item';
 
 export const createItemSubCategory = async (req: Request, res: Response) => {
     const { name, description, categoryId, organizationId } = req.body;
@@ -58,10 +59,16 @@ export const updateItemSubCategory = async (req: Request, res: Response) => {
     }
 };
 
-export const deleteItemSubCategory = async (req: Request, res: Response) => {
+export const deleteItemSubCategory = async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
 
     try {
+        const isCategoryHavingItemsUnderIt = await Item.find({ organization: req.user!.organization, category: id })
+
+        if(isCategoryHavingItemsUnderIt.length > 0){
+            return res.status(401).json({ message: "Not allowed. Category is having Sub-category or Items"})
+        }
+
         const itemSubCategory = await ItemSubCategory.findByIdAndDelete(id);
 
         if (!itemSubCategory) {
