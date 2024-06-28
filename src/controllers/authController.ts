@@ -108,8 +108,8 @@ export const register = async (req: Request, res: Response) => {
             role: role._id,
             image: userImage,
             organization: organization!._id,
-            department: department!._id,
-            subDepartment: subDepartment!._id
+            department: department!._id || undefined,
+            subDepartment: subDepartment!._id || undefined
         });
 
         const token = generateToken(user._id, role.name, user.organization);
