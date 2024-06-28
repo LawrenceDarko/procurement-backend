@@ -136,11 +136,18 @@ export const updateSubDepartment = async (req: Request, res: Response) => {
     }
 };
 
-export const deleteSubDepartment = async (req: Request, res: Response) => {
+export const deleteSubDepartment = async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
 
 
     try {
+        const isSubDepartmentHavingUsersUnderIt = await User.find({ organization: req.user!.organization, subDepartment: id });
+
+        // const isSubDepartementHavingSubDepartments = await SubDepartment.find({ department: id})
+        if(isSubDepartmentHavingUsersUnderIt.length > 0){
+            return res.status(401).json({ message: "Not allowed. Sub-department is having Users"})
+        }
+
         const subDepartment = await SubDepartment.findByIdAndDelete(id);
 
         if (!subDepartment) {
