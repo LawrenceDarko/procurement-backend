@@ -55,27 +55,34 @@ export const createBudgetsInBulk = async (req: Request, res: Response) => {
 };
 
 
-export const getBudgets = async (req: Request, res: Response) => {
+export const getBudgets = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const budgets = await Budget.find().populate('department subDepartment itemCategory itemSubCategory item organization');
+        const budgets = await Budget.find({ organization: req.user!.organization }).populate('department subDepartment itemCategory itemSubCategory item organization');
 
-        let totalBudget = 0;
-        let totalSpent = 0;
+        const budgetData = budgets.reduce((acc: any, budget: any) => {
+            const year = `year${budget.financialYear}`;
+            if (!acc[year]) {
+                acc[year] = {
+                    totalBudget: 0,
+                    totalSpent: 0,
+                    balance: 0,
+                    budgets: []
+                };
+            }
 
-        budgets.forEach(budget => {
-            totalBudget += budget.totalEstimatedAmount;
-            // Assuming totalSpent is tracked in the budget model (this would need to be included in the Budget schema)
-            // totalSpent += budget.totalSpent || 0;
-        });
+            acc[year].totalBudget += budget.totalEstimatedAmount;
+            acc[year].totalSpent += budget.totalSpent || 0;
+            acc[year].balance = acc[year].totalBudget - acc[year].totalSpent;
+            acc[year].budgets.push(budget);
 
-        const balance = totalBudget - totalSpent;
+            return acc;
+        }, {});
 
-        res.status(200).json({
-            totalBudget,
-            totalSpent,
-            balance,
-            budgets
-        });
+        const result = Object.keys(budgetData).map(year => ({
+            [year]: budgetData[year]
+        }));
+
+    res.status(200).json(result);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
