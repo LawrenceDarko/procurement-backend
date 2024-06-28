@@ -60,14 +60,14 @@ export const registerOrganization = async (req: Request, res: Response) => {
 export const register = async (req: Request, res: Response) => {
     const { username, email, password, organizationId, departmentId, subDepartmentId, roleName } = req.body;
 
-    if( !username || !email || !password || !organizationId || !roleName || !subDepartmentId ){
-        return res.status(400).json({ message: 'All fields are required'})
+    if (!username || !email || !password || !organizationId || !roleName) {
+        return res.status(400).json({ message: 'All fields are required' });
     }
 
-    let userImage = null
-    if(req.file) {
-        const uploadedImage = req.file
-        userImage = uploadedImage.filename
+    let department, subDepartment, userImage = null;
+
+    if (req.file) {
+        userImage = req.file.filename;
     }
 
     try {
@@ -76,14 +76,18 @@ export const register = async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'Organization does not exist' });
         }
 
-        const department = await Department.findById(departmentId);
-        if (!department) {
-            return res.status(400).json({ message: 'Department does not exist' });
+        if (departmentId) {
+            department = await Department.findById(departmentId);
+            if (!department) {
+                return res.status(400).json({ message: 'Department does not exist' });
+            }
         }
 
-        const subDepartment = await SubDepartment.findById(subDepartmentId);
-        if (!subDepartment) {
-            return res.status(400).json({ message: 'Sub-Department does not exist' });
+        if (subDepartmentId) {
+            subDepartment = await SubDepartment.findById(subDepartmentId);
+            if (!subDepartment) {
+                return res.status(400).json({ message: 'Sub-Department does not exist' });
+            }
         }
 
         const role = await Role.findOne({ name: roleName, organization: organization._id });
@@ -98,23 +102,18 @@ export const register = async (req: Request, res: Response) => {
 
         const hashedPassword = await hashPassword(password);
 
-        
-
-
         const user = await User.create({
             username,
             email,
             password: hashedPassword,
             role: role._id,
             image: userImage,
-            organization: organization!._id,
-            department: department!._id || undefined,
-            subDepartment: subDepartment!._id || undefined
+            organization: organization._id,
+            department: department?._id,
+            subDepartment: subDepartment?._id
         });
 
         const token = generateToken(user._id, role.name, user.organization);
-
-        // const populatedDepartment = await Department.findById(user.department);
 
         const sanitizedUser = {
             _id: user._id,
@@ -122,17 +121,19 @@ export const register = async (req: Request, res: Response) => {
             email: user.email,
             role: user.role,
             roleName: role.name,
-            organization: organization,
+            organization,
             image: user.image,
-            department: department,
-            subDepartment: subDepartment
+            department,
+            subDepartment
         };
 
         res.status(201).json({ success: true, data: sanitizedUser, token, message: 'User created Successfully' });
     } catch (error) {
+        console.log("ERROR REGISTERING USER", error)
         res.status(500).json({ message: 'Server error' });
     }
 };
+
 
 export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
