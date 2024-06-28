@@ -9,7 +9,7 @@ export const createItem = async (req: Request, res: Response) => {
         const item = await Item.create({
             name,
             description,
-            category: categoryId || undefined,
+            category: categoryId,
             subCategory: subCategoryId || undefined,
             organization: organizationId
         });

@@ -14,8 +14,9 @@ export const createItemSubCategory = async (req: Request, res: Response) => {
             organization: OrganizationId
         });
 
-        res.status(201).json(itemSubCategory);
+        res.status(201).json({success: true, data: itemSubCategory, message: 'Item Sub Category Created Successfully'});
     } catch (error) {
+
         res.status(500).json({ message: 'Server error' });
     }
 };

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Budget from '../models/Budget';
 import Organization from '../models/Organization';
+import { AuthenticatedRequest } from '../middleware/authMiddleware';
 
 export const createBudget = async (req: Request, res: Response) => {
     const {
@@ -53,10 +54,28 @@ export const createBudgetsInBulk = async (req: Request, res: Response) => {
     }
 };
 
+
 export const getBudgets = async (req: Request, res: Response) => {
     try {
-        const budgets = await Budget.find().populate('department subDepartment itemCategory itemSubCategory item');
-        res.status(200).json(budgets);
+        const budgets = await Budget.find().populate('department subDepartment itemCategory itemSubCategory item organization');
+
+        let totalBudget = 0;
+        let totalSpent = 0;
+
+        budgets.forEach(budget => {
+            totalBudget += budget.totalEstimatedAmount;
+            // Assuming totalSpent is tracked in the budget model (this would need to be included in the Budget schema)
+            // totalSpent += budget.totalSpent || 0;
+        });
+
+        const balance = totalBudget - totalSpent;
+
+        res.status(200).json({
+            totalBudget,
+            totalSpent,
+            balance,
+            budgets
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
