@@ -181,6 +181,22 @@ export const getAllUsers = async (req: AuthenticatedRequest, res: Response) => {
     }
 };
 
+export const getAllUsersByRole = async (req: AuthenticatedRequest, res: Response) => {
+    const { roleId } = req.params;
+
+    const roleExist = await Role.find({ organization: req.user!.organization, _id: roleId });
+    if (!roleExist) {
+        return res.status(400).json({ message: 'Role does not exists' });
+    }
+
+    try {
+        const users = await User.find({ organization: req.user!.organization, role: roleId }).populate('organization department subDepartment role');
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 export const getAUser = async (req: Request, res: Response) => {
     const { id } = req.params;
 
