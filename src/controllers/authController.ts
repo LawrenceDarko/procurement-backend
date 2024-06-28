@@ -7,6 +7,7 @@ import { hashPassword } from '../utils/hashPassword';
 import validatePassword from '../utils/validatePassword';
 import SubDepartment from '../models/SubDepartment';
 import Department from '../models/Department';
+import { AuthenticatedRequest } from '../middleware/authMiddleware';
 // import { validatePassword } from '../utils/validatePassword';
 
 export const registerOrganization = async (req: Request, res: Response) => {
@@ -171,9 +172,9 @@ export const login = async (req: Request, res: Response) => {
     }
 };
 
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getAllUsers = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const users = await User.find().populate('role').populate('organization');
+        const users = await User.find({ organization: req.user!.organization }).populate('organization department subDepartment role');
         res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
