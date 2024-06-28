@@ -4,19 +4,19 @@ import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import Organization from '../models/Organization';
 
 export const createItemSubCategory = async (req: Request, res: Response) => {
-    const { name, description, categoryId, OrganizationId } = req.body;
+    const { name, description, categoryId, organizationId } = req.body;
 
     try {
         const itemSubCategory = await ItemSubCategory.create({
             name,
             description,
             category: categoryId,
-            organization: OrganizationId
+            organization: organizationId
         });
 
         res.status(201).json({success: true, data: itemSubCategory, message: 'Item Sub Category Created Successfully'});
     } catch (error) {
-
+        console.log("ERROR CREATING SUB-CATEGORY", error)
         res.status(500).json({ message: 'Server error' });
     }
 };
