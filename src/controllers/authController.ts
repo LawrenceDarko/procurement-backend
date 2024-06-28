@@ -122,7 +122,7 @@ export const register = async (req: Request, res: Response) => {
             email: user.email,
             role: user.role,
             roleName: role.name,
-            organization: user.organization,
+            organization: organization,
             image: user.image,
             department: department,
             subDepartment: subDepartment
