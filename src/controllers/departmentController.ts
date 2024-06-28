@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import Department from '../models/Department';
 import SubDepartment from '../models/SubDepartment';
+import User from '../models/User';
+import { AuthenticatedRequest } from '../middleware/authMiddleware';
 
 export const createDepartment = async (req: Request, res: Response) => {
     const { name, organizationId } = req.body;
@@ -55,10 +57,18 @@ export const updateDepartment = async (req: Request, res: Response) => {
     }
 };
 
-export const deleteDepartment = async (req: Request, res: Response) => {
+export const deleteDepartment = async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
 
     try {
+
+        const isDepartmentHavingUsersUnderIt = await User.find({ organization: req.user!.organization, department: id });
+
+        const isDepartementHavingSubDepartments = await SubDepartment.find({ department: id})
+        if(isDepartementHavingSubDepartments.length > 0 || isDepartmentHavingUsersUnderIt.length > 0){
+            return res.status(401).json({ message: "Not allowed. Department is having sub-department or Users"})
+        }
+
         const department = await Department.findByIdAndDelete(id);
 
         if (!department) {
@@ -128,6 +138,7 @@ export const updateSubDepartment = async (req: Request, res: Response) => {
 
 export const deleteSubDepartment = async (req: Request, res: Response) => {
     const { id } = req.params;
+
 
     try {
         const subDepartment = await SubDepartment.findByIdAndDelete(id);

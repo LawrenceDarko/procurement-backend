@@ -96,7 +96,12 @@ export const register = async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'Role does not exist' });
         }
 
-        const existingUser = await User.findOne({ email, username });
+        const existingUserName = await User.findOne({ username });
+        if (existingUserName) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+
+        const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists' });
         }

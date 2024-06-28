@@ -12,14 +12,14 @@ const departmentSchema = new Schema<IDepartment>({
     organization: { type: Schema.Types.ObjectId, ref: 'Organization', required: true },
 }, { timestamps: true });
 
-departmentSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    try {
-        await SubDepartment.deleteMany({ department: this._id });
-        next();
-    } catch (err: any) {
-        next(err);
-    }
-});
+// departmentSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+//     try {
+//         await SubDepartment.deleteMany({ department: this._id });
+//         next();
+//     } catch (err: any) {
+//         next(err);
+//     }
+// });
 
 const Department = model<IDepartment>('Department', departmentSchema);
 
