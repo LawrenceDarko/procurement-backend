@@ -2,6 +2,7 @@ import { Schema, model, Document } from 'mongoose';
 import { IRole } from './Role';
 import { IOrganization } from './Organization';
 import { IDepartment } from './Department';
+import { ISubDepartment } from './SubDepartment';
 
 interface IUser extends Document {
     username: string;
@@ -10,6 +11,7 @@ interface IUser extends Document {
     role: IRole['_id'];
     image: string;
     department: IDepartment['_id'];
+    subDepartment: ISubDepartment['_id'];
     organization: IOrganization['_id'];
 }
 
@@ -20,7 +22,8 @@ const userSchema = new Schema<IUser>({
     role: { type: Schema.Types.ObjectId, ref: 'Role', required: true },
     image: { type: String},
     organization: { type: Schema.Types.ObjectId, ref: 'Organization', required: true },
-    department: { type: Schema.Types.ObjectId, ref: 'Department' }
+    department: { type: Schema.Types.ObjectId, ref: 'Department' },
+    subDepartment: { type: Schema.Types.ObjectId, ref: 'SubDepartment' }
 }, { timestamps: true });
 
 const User = model<IUser>('User', userSchema);

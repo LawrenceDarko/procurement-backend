@@ -58,9 +58,9 @@ export const registerOrganization = async (req: Request, res: Response) => {
 };
 
 export const register = async (req: Request, res: Response) => {
-    const { username, email, password, organizationId, departmentId, roleName } = req.body;
+    const { username, email, password, organizationId, departmentId, subDepartmentId, roleName } = req.body;
 
-    if( !username || !email || !password || !organizationId || !roleName ){
+    if( !username || !email || !password || !organizationId || !roleName || !subDepartmentId ){
         return res.status(400).json({ message: 'All fields are required'})
     }
 
@@ -79,6 +79,11 @@ export const register = async (req: Request, res: Response) => {
         const department = await Department.findById(departmentId);
         if (!department) {
             return res.status(400).json({ message: 'Department does not exist' });
+        }
+
+        const subDepartment = await SubDepartment.findById(subDepartmentId);
+        if (!subDepartment) {
+            return res.status(400).json({ message: 'Sub-Department does not exist' });
         }
 
         const role = await Role.findOne({ name: roleName, organization: organization._id });
@@ -103,12 +108,13 @@ export const register = async (req: Request, res: Response) => {
             role: role._id,
             image: userImage,
             organization: organization!._id,
-            department: department!._id
+            department: department!._id,
+            subDepartment: subDepartment!._id
         });
 
         const token = generateToken(user._id, role.name, user.organization);
 
-        const populatedDepartment = await Department.findById(user.department);
+        // const populatedDepartment = await Department.findById(user.department);
 
         const sanitizedUser = {
             _id: user._id,
@@ -118,7 +124,8 @@ export const register = async (req: Request, res: Response) => {
             roleName: role.name,
             organization: user.organization,
             image: user.image,
-            department: populatedDepartment 
+            department: department,
+            subDepartment: subDepartment
         };
 
         res.status(201).json({ success: true, data: sanitizedUser, token, message: 'User created Successfully' });

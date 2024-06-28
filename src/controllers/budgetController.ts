@@ -34,6 +34,7 @@ export const createBudget = async (req: Request, res: Response) => {
 
         res.status(201).json({success: true, data: budget, message: 'Budget Created Successfully'});
     } catch (error) {
+        console.log("ERROR CREATING BUDGET", error)
         res.status(500).json({ message: 'Server error' });
     }
 };
