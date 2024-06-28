@@ -63,7 +63,7 @@ export const deleteItemSubCategory = async (req: AuthenticatedRequest, res: Resp
     const { id } = req.params;
 
     try {
-        const isCategoryHavingItemsUnderIt = await Item.find({ organization: req.user!.organization, category: id })
+        const isCategoryHavingItemsUnderIt = await Item.find({ organization: req.user!.organization, subCategory: id })
 
         if(isCategoryHavingItemsUnderIt.length > 0){
             return res.status(401).json({ message: "Not allowed. Category is having Sub-category or Items"})
