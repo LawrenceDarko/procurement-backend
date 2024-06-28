@@ -66,34 +66,40 @@ export const createBudgetsInBulk = async (req: Request, res: Response) => {
 
 export const getBudgets = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const budgets = await Budget.find({ organization: req.user!.organization }).populate('department subDepartment itemCategory itemSubCategory item organization');
+    const budgets = await Budget.find({ organization: req.user!.organization})
+        .populate('department')
+        .populate('subDepartment')
+        .populate('itemCategory')
+        .populate('itemSubCategory')
+        .populate('item')
+        .populate('organization');
 
-        const budgetData = budgets.reduce((acc: any, budget: any) => {
-            const year = `year${budget.financialYear}`;
-            if (!acc[year]) {
-                acc[year] = {
-                    totalBudget: 0,
-                    totalSpent: 0,
-                    balance: 0,
-                    budgets: []
-                };
-            }
+    const budgetMap: any = {};
 
-            acc[year].totalBudget += budget.totalEstimatedAmount;
-            acc[year].totalSpent += budget.totalSpent || 0;
-            acc[year].balance = acc[year].totalBudget - acc[year].totalSpent;
-            acc[year].budgets.push(budget);
+    budgets.forEach(budget => {
+        const year = budget.financialYear;
 
-            return acc;
-        }, {});
+        if (!budgetMap[year]) {
+        budgetMap[year] = {
+            budgetYear: year,
+            totalBudget: 0,
+            totalSpent: 0, // Assuming no data for spent, replace if you have a field
+            balance: 0,
+            budgets: []
+        };
+        }
 
-        const result = Object.keys(budgetData).map(year => ({
-            [year]: budgetData[year]
-        }));
+        budgetMap[year].totalBudget += budget.totalEstimatedAmount;
+        // Assuming no data for spent, replace if you have a field
+        budgetMap[year].balance = budgetMap[year].totalBudget - budgetMap[year].totalSpent;
+        budgetMap[year].budgets.push(budget);
+    });
 
-    res.status(200).json(result);
+    const formattedResponse = Object.values(budgetMap);
+
+    res.status(200).json({success: true, data: formattedResponse});
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error' });
     }
 };
 
