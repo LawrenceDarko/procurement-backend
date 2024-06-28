@@ -15,6 +15,7 @@ interface IBudget extends Document {
     IFTNumber: string;
     currency: string;
     totalEstimatedAmount: number;
+    otherItem: string;
 }
 
 const budgetSchema = new Schema<IBudget>({
@@ -32,6 +33,7 @@ const budgetSchema = new Schema<IBudget>({
     IFTNumber: { type: String, required: true },
     currency: { type: String, required: true },
     totalEstimatedAmount: { type: Number, required: true },
+    otherItem: { type: String }
 }, { timestamps: true });
 
 export default model<IBudget>('Budget', budgetSchema);

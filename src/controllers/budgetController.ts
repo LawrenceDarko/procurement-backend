@@ -8,7 +8,7 @@ export const createBudget = async (req: Request, res: Response) => {
     const {
         financialYear, department, subDepartment, itemCategory, itemSubCategory,
         item, unitPrice, quantity, productSpecification, IFTNumber, currency,
-        totalEstimatedAmount, organizationId, budgetOwnerId
+        totalEstimatedAmount, organizationId, budgetOwnerId, otherItem
     } = req.body;
 
     const organization = await Organization.findById(organizationId);
@@ -36,7 +36,8 @@ export const createBudget = async (req: Request, res: Response) => {
             IFTNumber,
             currency,
             totalEstimatedAmount,
-            budgetOwner: budgetOwner!._id
+            budgetOwner: budgetOwner!._id,
+            otherItem: otherItem || undefined
         });
 
         res.status(201).json({success: true, data: budget, message: 'Budget Created Successfully'});
