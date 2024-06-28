@@ -7,6 +7,7 @@ interface IBudget extends Document {
     itemCategory: Schema.Types.ObjectId;
     itemSubCategory?: Schema.Types.ObjectId;
     organization?: Schema.Types.ObjectId;
+    budgetOwner: Schema.Types.ObjectId;
     item: Schema.Types.ObjectId;
     unitPrice: number;
     quantity: number;
@@ -23,6 +24,7 @@ const budgetSchema = new Schema<IBudget>({
     itemCategory: { type: Schema.Types.ObjectId, ref: 'ItemCategory', required: true },
     itemSubCategory: { type: Schema.Types.ObjectId, ref: 'ItemSubCategory' },
     organization: { type: Schema.Types.ObjectId, ref: 'Organization' },
+    budgetOwner: { type: Schema.Types.ObjectId, ref: 'User' },
     item: { type: Schema.Types.ObjectId, ref: 'Item', required: true },
     unitPrice: { type: Number, required: true },
     quantity: { type: Number, required: true },

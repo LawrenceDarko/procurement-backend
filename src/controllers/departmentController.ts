@@ -87,7 +87,7 @@ export const createSubDepartment = async (req: Request, res: Response) => {
 };
 
 export const getSubDepartments = async (req: Request, res: Response) => {
-    console.log("Hello world")
+    // console.log("Hello world")
     try {
         const subDepartments = await SubDepartment.find().populate('department');
         res.status(200).json(subDepartments);

@@ -2,18 +2,24 @@ import { Request, Response } from 'express';
 import Budget from '../models/Budget';
 import Organization from '../models/Organization';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
+import User from '../models/User';
 
 export const createBudget = async (req: Request, res: Response) => {
     const {
         financialYear, department, subDepartment, itemCategory, itemSubCategory,
         item, unitPrice, quantity, productSpecification, IFTNumber, currency,
-        totalEstimatedAmount, organizationId
+        totalEstimatedAmount, organizationId, budgetOwnerId
     } = req.body;
 
     const organization = await Organization.findById(organizationId);
         if (!organization) {
             return res.status(400).json({ message: 'Organization does not exist' });
         }
+
+    const budgetOwner = await User.findById(budgetOwnerId);
+    if (!budgetOwner) {
+        return res.status(400).json({ message: 'Budget Owner does not exist' });
+    }
 
     try {
         const budget = await Budget.create({
@@ -30,6 +36,7 @@ export const createBudget = async (req: Request, res: Response) => {
             IFTNumber,
             currency,
             totalEstimatedAmount,
+            budgetOwner: budgetOwner!._id
         });
 
         res.status(201).json({success: true, data: budget, message: 'Budget Created Successfully'});
