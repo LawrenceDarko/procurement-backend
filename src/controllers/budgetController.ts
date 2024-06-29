@@ -66,35 +66,44 @@ export const createBudgetsInBulk = async (req: Request, res: Response) => {
 
 export const getBudgets = async (req: AuthenticatedRequest, res: Response) => {
     try {
-    const budgets = await Budget.find({ organization: req.user!.organization}).populate('department subDepartment itemCategory itemSubCategory item organization');
+        const { year, departmentId } = req.query;
+        let filter: any = {};
 
-    const groupedBudgets: { [year: string]: any } = {};
+        if (year) {
+            filter.financialYear = year;
+        }
+        if (departmentId) {
+            filter.department = departmentId;
+        }
+        const budgets = await Budget.find({ ...filter, organization: req.user!.organization}).populate('department subDepartment itemCategory itemSubCategory item organization');
 
-    budgets.forEach((budget) => {
-        const year = budget.financialYear;
-        if (!groupedBudgets[year]) {
-        groupedBudgets[year] = {
-            budgetYear: year,
-            totalBudget: 0,
-            totalSpent: 0,
-            balance: 0,
-            budgets: [],
-        };
+        const groupedBudgets: { [year: string]: any } = {};
+
+        budgets.forEach((budget) => {
+            const year = budget.financialYear;
+            if (!groupedBudgets[year]) {
+            groupedBudgets[year] = {
+                budgetYear: year,
+                totalBudget: 0,
+                totalSpent: 0,
+                balance: 0,
+                budgets: [],
+            };
+            }
+
+            groupedBudgets[year].budgets.push(budget);
+            groupedBudgets[year].totalBudget += budget.totalEstimatedAmount;
+        });
+
+        for (const year in groupedBudgets) {
+            groupedBudgets[year].balance = groupedBudgets[year].totalBudget - groupedBudgets[year].totalSpent;
         }
 
-        groupedBudgets[year].budgets.push(budget);
-        groupedBudgets[year].totalBudget += budget.totalEstimatedAmount;
-    });
+        const response = Object.values(groupedBudgets);
 
-    for (const year in groupedBudgets) {
-        groupedBudgets[year].balance = groupedBudgets[year].totalBudget - groupedBudgets[year].totalSpent;
-    }
-
-    const response = Object.values(groupedBudgets);
-
-    res.status(200).json(response);
+        res.status(200).json(response);
     } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
