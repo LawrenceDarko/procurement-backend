@@ -35,7 +35,7 @@ const budgetSchema = new Schema<IBudget>({
     currency: { type: String, required: true },
     totalEstimatedAmount: { type: Number, required: true },
     otherItem: { type: String },
-    budgetIsLocked: { type: Boolean, default: false}
+    budgetIsLocked: { type: Boolean, default: false }
 }, { timestamps: true });
 
 export default model<IBudget>('Budget', budgetSchema);
