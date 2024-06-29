@@ -66,38 +66,33 @@ export const createBudgetsInBulk = async (req: Request, res: Response) => {
 
 export const getBudgets = async (req: AuthenticatedRequest, res: Response) => {
     try {
-    const budgets = await Budget.find({ organization: req.user!.organization})
-        .populate('department')
-        .populate('subDepartment')
-        .populate('itemCategory')
-        .populate('itemSubCategory')
-        .populate('item')
-        .populate('organization');
+    const budgets = await Budget.find({ organization: req.user!.organization}).populate('department subDepartment itemCategory itemSubCategory item organization');
 
-    const budgetMap: any = {};
+    const groupedBudgets: { [year: string]: any } = {};
 
-    budgets.forEach(budget => {
+    budgets.forEach((budget) => {
         const year = budget.financialYear;
-
-        if (!budgetMap[year]) {
-        budgetMap[year] = {
+        if (!groupedBudgets[year]) {
+        groupedBudgets[year] = {
             budgetYear: year,
             totalBudget: 0,
-            totalSpent: 0, // Assuming no data for spent, replace if you have a field
+            totalSpent: 0,
             balance: 0,
-            budgets: []
+            budgets: [],
         };
         }
 
-        budgetMap[year].totalBudget += budget.totalEstimatedAmount;
-        // Assuming no data for spent, replace if you have a field
-        budgetMap[year].balance = budgetMap[year].totalBudget - budgetMap[year].totalSpent;
-        budgetMap[year].budgets.push(budget);
+        groupedBudgets[year].budgets.push(budget);
+        groupedBudgets[year].totalBudget += budget.totalEstimatedAmount;
     });
 
-    const formattedResponse = Object.values(budgetMap);
+    for (const year in groupedBudgets) {
+        groupedBudgets[year].balance = groupedBudgets[year].totalBudget - groupedBudgets[year].totalSpent;
+    }
 
-    res.status(200).json({success: true, data: formattedResponse});
+    const response = Object.values(groupedBudgets);
+
+    res.status(200).json(response);
     } catch (error) {
     res.status(500).json({ message: 'Server error' });
     }
