@@ -26,13 +26,13 @@ export const createBudget = async (req: Request, res: Response) => {
             financialYear,
             department,
             subDepartment: subDepartment || undefined,
-            itemCategory,
+            itemCategory: itemCategory || undefined,
             itemSubCategory: itemSubCategory || undefined,
             organization: organization._id,
-            item,
+            item: item || undefined,
             unitPrice,
             quantity,
-            productSpecification,
+            productSpecification: productSpecification || undefined,
             IFTNumber,
             currency,
             totalEstimatedAmount,
@@ -128,29 +128,36 @@ export const updateBudget = async (req: Request, res: Response) => {
     const {
         financialYear, department, subDepartment, itemCategory, itemSubCategory,
         item, unitPrice, quantity, productSpecification, IFTNumber, currency,
-        totalEstimatedAmount, organizationId
+        totalEstimatedAmount, organizationId, budgetOwnerId, otherItem
     } = req.body;
 
     const organization = await Organization.findById(organizationId);
-        if (!organization) {
-            return res.status(400).json({ message: 'Organization does not exist' });
-        }
+    if (!organization) {
+        return res.status(400).json({ message: 'Organization does not exist' });
+    }
+
+    const budgetOwner = await User.findById(budgetOwnerId);
+    if (!budgetOwner) {
+        return res.status(400).json({ message: 'Budget Owner does not exist' });
+    }
 
     try {
         const budget = await Budget.findByIdAndUpdate(id, {
             financialYear,
             department,
             subDepartment: subDepartment || undefined,
-            itemCategory,
+            itemCategory: itemCategory || undefined,
             itemSubCategory: itemSubCategory || undefined,
             organization: organization._id,
-            item,
+            item: item || undefined,
             unitPrice,
             quantity,
-            productSpecification,
+            productSpecification: productSpecification || undefined,
             IFTNumber,
             currency,
             totalEstimatedAmount,
+            budgetOwner: budgetOwner!._id,
+            otherItem: otherItem || undefined
         }, { new: true });
 
         if (!budget) {

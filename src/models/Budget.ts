@@ -16,24 +16,26 @@ interface IBudget extends Document {
     currency: string;
     totalEstimatedAmount: number;
     otherItem: string;
+    budgetIsLocked: boolean;
 }
 
 const budgetSchema = new Schema<IBudget>({
     financialYear: { type: String, required: true },
     department: { type: Schema.Types.ObjectId, ref: 'Department', required: true },
     subDepartment: { type: Schema.Types.ObjectId, ref: 'SubDepartment' },
-    itemCategory: { type: Schema.Types.ObjectId, ref: 'ItemCategory', required: true },
+    itemCategory: { type: Schema.Types.ObjectId, ref: 'ItemCategory' },
     itemSubCategory: { type: Schema.Types.ObjectId, ref: 'ItemSubCategory' },
     organization: { type: Schema.Types.ObjectId, ref: 'Organization' },
     budgetOwner: { type: Schema.Types.ObjectId, ref: 'User' },
-    item: { type: Schema.Types.ObjectId, ref: 'Item', required: true },
+    item: { type: Schema.Types.ObjectId, ref: 'Item' },
     unitPrice: { type: Number, required: true },
     quantity: { type: Number, required: true },
-    productSpecification: { type: String, required: true },
+    productSpecification: { type: String },
     IFTNumber: { type: String, required: true },
     currency: { type: String, required: true },
     totalEstimatedAmount: { type: Number, required: true },
-    otherItem: { type: String }
+    otherItem: { type: String },
+    budgetIsLocked: { type: Boolean, default: false}
 }, { timestamps: true });
 
 export default model<IBudget>('Budget', budgetSchema);
