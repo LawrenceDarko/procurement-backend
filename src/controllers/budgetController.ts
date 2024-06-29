@@ -75,7 +75,7 @@ export const getBudgets = async (req: AuthenticatedRequest, res: Response) => {
         if (departmentId) {
             filter.department = departmentId;
         }
-        const budgets = await Budget.find({ ...filter, organization: req.user!.organization}).populate('department subDepartment itemCategory itemSubCategory item organization');
+        const budgets = await Budget.find({ ...filter, organization: req.user!.organization}).populate('department subDepartment itemCategory itemSubCategory item organization budgetOwner');
 
         const groupedBudgets: { [year: string]: any } = {};
 
