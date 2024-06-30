@@ -9,8 +9,8 @@ export const createDepartment = async (req: Request, res: Response) => {
 
     try {
         const department = await Department.create({
-        name,
-        organization: organizationId,
+            name,
+            organization: organizationId,
         });
 
         res.status(201).json(department);

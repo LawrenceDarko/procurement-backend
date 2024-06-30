@@ -4,12 +4,18 @@ import Organization from '../models/Organization';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import User from '../models/User';
 
-export const createBudget = async (req: Request, res: Response) => {
+export const createBudget = async (req: AuthenticatedRequest, res: Response) => {
     const {
         financialYear, department, subDepartment, itemCategory, itemSubCategory,
         item, unitPrice, quantity, productSpecification, IFTNumber, currency,
         totalEstimatedAmount, organizationId, budgetOwnerId, otherItem
     } = req.body;
+
+    const isLocked = await Budget.exists({organization: req.user!.organization, financialYear, budgetIsLocked: true });
+
+    if (isLocked) {
+        return res.status(403).json({ message: `Budget year ${financialYear} is locked` });
+    }
 
     const organization = await Organization.findById(organizationId);
         if (!organization) {
@@ -47,11 +53,19 @@ export const createBudget = async (req: Request, res: Response) => {
     }
 };
 
-export const createBudgetsInBulk = async (req: Request, res: Response) => {
+export const createBudgetsInBulk = async (req: AuthenticatedRequest, res: Response) => {
     const budgets = req.body;
 
     if (!Array.isArray(budgets)) {
         return res.status(400).json({ message: 'Invalid data format. "budgets" should be an array.' });
+    }
+
+    const financialYears = budgets.map((budget: any) => budget.financialYear);
+
+    const lockedYears = await Budget.find({ organization: req.user!.organization, financialYear: { $in: financialYears }, budgetIsLocked: true });
+
+    if (lockedYears.length > 0) {
+        return res.status(403).json({ message: `One or more budget years are locked` });
     }
 
     try {
@@ -123,13 +137,19 @@ export const getBudget = async (req: Request, res: Response) => {
     }
 };
 
-export const updateBudget = async (req: Request, res: Response) => {
+export const updateBudget = async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     const {
         financialYear, department, subDepartment, itemCategory, itemSubCategory,
         item, unitPrice, quantity, productSpecification, IFTNumber, currency,
-        totalEstimatedAmount, organizationId, budgetOwnerId, otherItem
+        totalEstimatedAmount, organizationId, budgetOwnerId, otherItem, budgetStatus
     } = req.body;
+
+    const isLocked = await Budget.exists({organization: req.user!.organization, financialYear, budgetIsLocked: true });
+
+    if (isLocked) {
+        return res.status(403).json({ message: `Budget year ${financialYear} is locked and cannot be edited. Consult your Supervisor.` });
+    }
 
     const organization = await Organization.findById(organizationId);
     if (!organization) {
@@ -157,7 +177,8 @@ export const updateBudget = async (req: Request, res: Response) => {
             currency,
             totalEstimatedAmount,
             budgetOwner: budgetOwner!._id,
-            otherItem: otherItem || undefined
+            otherItem: otherItem || undefined,
+            budgetStatus
         }, { new: true });
 
         if (!budget) {
@@ -181,6 +202,26 @@ export const deleteBudget = async (req: Request, res: Response) => {
         }
 
         res.status(200).json({ message: 'Budget deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const lockBudgetYear = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const { year } = req.params;
+        await Budget.updateMany({ organization: req.user!.organization, financialYear: year }, { $set: { budgetIsLocked: true } });
+        res.status(200).json({ message: `Budget year ${year} locked successfully` });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const unlockBudgetYear = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const { year } = req.params;
+        await Budget.updateMany({ organization: req.user!.organization, financialYear: year }, { $set: { budgetIsLocked: false } });
+        res.status(200).json({ message: `Budget year ${year} unlocked successfully` });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

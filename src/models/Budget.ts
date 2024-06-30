@@ -17,6 +17,7 @@ interface IBudget extends Document {
     totalEstimatedAmount: number;
     otherItem: string;
     budgetIsLocked: boolean;
+    budgetStatus: 'pending' | 'approved' | 'rejected';
 }
 
 const budgetSchema = new Schema<IBudget>({
@@ -35,7 +36,8 @@ const budgetSchema = new Schema<IBudget>({
     currency: { type: String, required: true },
     totalEstimatedAmount: { type: Number, required: true },
     otherItem: { type: String },
-    budgetIsLocked: { type: Boolean, default: false }
+    budgetIsLocked: { type: Boolean, default: false },
+    budgetStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending'}
 }, { timestamps: true });
 
 export default model<IBudget>('Budget', budgetSchema);
